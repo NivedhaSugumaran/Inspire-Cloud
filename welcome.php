@@ -27,7 +27,7 @@ $result=mysqli_query($connect,$query1);
       $id=$_SESSION['id'];
 
 
-      $query = "INSERT INTO certificate(certid,certname,certtype,certlevel,employeename,certdate,expirydate,validity,id) VALUES ('$certid','$certname','$certtype','$certlevel','$employeena$
+      $query = "INSERT INTO certificate(certid,certname,certtype,certlevel,employeename,certdate,expirydate,validity,id) VALUES ('$certid','$certname','$certtype','$certlevel','$employeename','$certdate','$expirydate','$validity','$id')";
       if(mysqli_query($connect, $query))
       {
            echo '<script>alert("Successfully added");
