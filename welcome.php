@@ -8,10 +8,11 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     exit;
 }
 
-$connect = mysqli_connect("ls-dd4af8cf955490fff21b5b6a14b67d56a90ae3eb.cfp0h459lz09.ap-south-1.rds.amazonaws.com:3306", "admin", "12345678", "inspirecloud");
+$connect = mysqli_connect("mynewdb.cnxnwp9zmsnt.ap-south-1.rds.amazonaws.com", "master", "12345678", "inspirecloud");
 $id=$_SESSION['id'];
 $query1 = "SELECT * FROM certificate where id='$id'";
 $result=mysqli_query($connect,$query1);
+
 
  if(isset($_POST["submit"]))
  {
@@ -26,12 +27,21 @@ $result=mysqli_query($connect,$query1);
       $validity=$_POST['validity'];
       $id=$_SESSION['id'];
 
-
-      $query = "INSERT INTO certificate(certid,certname,certtype,certlevel,employeename,certdate,expirydate,validity,id) VALUES ('$certid','$certname','$certtype','$certlevel','$employeename','$certdate','$expirydate','$validity','$id')";
+      $filename = $_FILES['file1']['name'];
+      $ext = pathinfo($filename, PATHINFO_EXTENSION);
+      $allowed = ['pdf', 'txt', 'doc', 'docx', 'png', 'jpg', 'jpeg',  'gif'];
+      if (in_array($ext, $allowed))
+        {
+          //set target directory
+          $path = 'uploads/';       
+          move_uploaded_file($_FILES['file1']['tmp_name'],($path . $filename));
+        }   
+            
+      $query = "INSERT INTO certificate(certid,certname,certtype,certlevel,employeename,certdate,expirydate,validity,id,filename) VALUES ('$certid','$certname','$certtype','$certlevel','$employeename','$certdate','$expirydate','$validity','$id','$filename')";
       if(mysqli_query($connect, $query))
       {
            echo '<script>alert("Successfully added");
-window.location.reload();</script>';
+           window.location.reload();</script>';
 
 
       }
@@ -107,12 +117,12 @@ window.location.reload();</script>';
                               <option value="Gcp">GCP</option>
 
                             </select>
- </div>
+                        </div>
                         <div class="form-group">
                             <label>Certification Level</label>
                             <input type="text" name="certlevel"  class="form-control" required>
                         </div>
- <div class="form-group">
+                           <div class="form-group">
                             <label>Certification Name</label>
                             <input type="text" name="certname"  class="form-control" required>
                         </div>
@@ -132,6 +142,21 @@ window.location.reload();</script>';
                             <label>Validity</label>
                             <input type="number" name="validity"  class="form-control" required>
                         </div>
+                         <div class="form-group">
+                             <label>Certificate File</label>
+                             <input type="file" name="file1" />
+                         </div>
+                          <?php if(isset($_GET['st'])) { ?>
+                <div class="alert alert-danger text-center">
+                <?php if ($_GET['st'] == 'success') {
+                        echo "File Uploaded Successfully!";
+                    }
+                    else
+                    {
+                        echo 'Invalid File Extension!';
+                    } ?>
+                </div>
+            <?php } ?>
       </div>
       <div class="modal-footer">
         <input type="reset" value="cancel" onClick="window.location.reload();"  class="btn btn-secondary" data-dismiss="modal">
@@ -159,8 +184,12 @@ window.location.reload();</script>';
 
                     <th>Certification Date</th>
                     <th>Expiry Date</th>
- <th>Validity</th>
-
+                    <th>Validity</th>
+                    <th>View File</th>
+                    <th>Download</th>
+                    <th>Actions</th>
+                    
+                    
                   </tr>
                 </thead>
 
@@ -176,8 +205,19 @@ window.location.reload();</script>';
                     <td><?php echo $row['certdate'];?></td>
                     <td><?php echo $row['expirydate'];?></td>
                     <td><?php echo $row['validity'];?></td>
+                    
+                    <td><a href="uploads/<?php echo $row['filename'];?>" target="_blank">View</a></td>
+                    <td><a href="uploads/<?php echo $row['filename'];?>" download>Download</a></td>
+    
+    <?php
+    echo "<td>";
+    echo "<a href='read.php?certid=". $row['certid'] ."' title='View Record' data-toggle='tooltip'><span class='glyphicon glyphicon-eye-open'></span></a>";
+    echo "<a href='update.php?certid=". $row['certid'] ."' title='Update Record' data-toggle='tooltip'><span class='glyphicon glyphicon-pencil'></span></a>";
+    echo "<a href='delete.php?certid=". $row['certid'] ."' title='Delete Record' data-toggle='tooltip'><span class='glyphicon glyphicon-trash'></span></a>";
+    echo "</td>";
+    ?>
 
-
+                    
                 </tr>
                   <?php } ?>
                 </tbody>
