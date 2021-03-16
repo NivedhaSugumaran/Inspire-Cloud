@@ -14,7 +14,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty(trim($_POST["email"]))){
         $email_err = "Please enter a email.";
     }
-        else if(!preg_match("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@virtusa\.com$^",$_POST["email"]))
+        else if(!preg_match("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@gmail\.com$^",$_POST["email"]))
        {
                    $email_err = "Invalid email address";
 
